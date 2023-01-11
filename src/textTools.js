@@ -133,6 +133,10 @@ function splitWords(text, noWrap) {
 
 	while (bk = breaker.nextBreak()) {
 		var word = text.slice(last, bk.position);
+		while (word.includes("\u2011")) {
+			bk = breaker.nextBreak();
+			word = text.slice(last, bk.position).replace("\u2011", "-");
+		}
 
 		if (bk.required || word.match(/\r?\n$|\r$/)) { // new line
 			word = word.replace(/\r?\n$|\r$/, '');

@@ -72,17 +72,24 @@ ElementWriter.prototype.alignLine = function (line) {
 		line.x = (line.x || 0) + offset;
 	}
 
+	// Don't justify after hyphens.
+	function justifiable(inline) {
+		return !inline.text || !inline.text.endsWith("-");
+	}
+
+	var count = line.inlines.filter(justifiable).length;
 	if (alignment === 'justify' &&
 		!line.newLineForced &&
 		!line.lastLineInParagraph &&
-		line.inlines.length > 1) {
-		var additionalSpacing = (width - lineWidth) / (line.inlines.length - 1);
+		count > 1) {
+		var additionalSpacing = (width - lineWidth) / (count - 1);
 
-		for (var i = 1, l = line.inlines.length; i < l; i++) {
-			offset = i * additionalSpacing;
-
+		for (var i = 0, l = line.inlines.length; i < l; i++) {
 			line.inlines[i].x += offset;
 			line.inlines[i].justifyShift = additionalSpacing;
+			if (justifiable(line.inlines[i])) {
+				offset += additionalSpacing;
+			}
 		}
 	}
 };
